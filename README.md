@@ -1,9 +1,10 @@
 # API Vault for VS Code
 
-A secure and convenient VS Code extension for managing your API keys directly from the Activity Bar.
+A secure and convenient VS Code extension for managing your API keys directly from the Activity Bar, now with sync support across VS Code instances!
 
 ## Features
 
+- 🔄 Sync API key names across VS Code instances
 - 🔒 Securely store API keys using VS Code's built-in SecretStorage
 - 🎯 Quick access from the Activity Bar
 - 👀 Easy-to-use interface for managing all your API keys
@@ -16,6 +17,14 @@ A secure and convenient VS Code extension for managing your API keys directly fr
 2. Look for the API icon in the Activity Bar (left sidebar)
 3. Click it to open the API Vault panel
 
+## Syncing Support
+
+API Vault 2.0 introduces syncing capabilities:
+- API key names are synced across all your VS Code instances
+- Key values remain secure in your local system keychain
+- Enable VS Code Settings Sync to automatically sync key names
+- Access your keys from any device while maintaining security
+
 ## Usage
 
 ### Opening API Vault
@@ -27,27 +36,35 @@ A secure and convenient VS Code extension for managing your API keys directly fr
 2. Enter the key name (e.g., "GITHUB_TOKEN")
 3. Enter the API key value
 4. Click "Store Key"
+5. The key name will sync across your VS Code instances
 
 ### Viewing Stored Keys
 - All your stored keys are automatically listed in the panel
 - Click "Show/Hide" next to any key to view its value
 - Click again to hide the value
+- Key names are synced, but values are stored securely in your local system keychain
 
 ### Deleting Keys
 - Click "Delete" next to any key you want to remove
 - Confirm the deletion when prompted
+- The deletion will sync across your VS Code instances
 
 ## Security
 
-API Vault uses VS Code's SecretStorage API to securely store your keys:
-- On macOS: Keys are stored in the system Keychain
-- On Windows: Keys are stored in the Windows Credential Manager
-- On Linux: Keys are stored in the system's secret service (libsecret)
+API Vault uses a hybrid approach for maximum security and convenience:
 
-Your API keys are:
+### Key Names (Synced)
+- Stored using VS Code's globalState
+- Synced across instances via Settings Sync
+- No sensitive information included
+
+### Key Values (Secure)
+- Stored using VS Code's SecretStorage API:
+  - On macOS: System Keychain
+  - On Windows: Windows Credential Manager
+  - On Linux: System's secret service (libsecret)
+- Never synced between instances
 - Encrypted at rest
-- Stored securely in your system's credential manager
-- Never stored in plain text
 - Only accessible within VS Code
 
 ## Commands
@@ -61,6 +78,7 @@ While the main interface is accessible from the Activity Bar, you can also use t
 ## Requirements
 
 - VS Code version 1.85.0 or higher
+- Settings Sync enabled (optional, for syncing key names)
 
 ## Extension Settings
 
@@ -71,6 +89,14 @@ This extension contributes no additional settings.
 None at this time.
 
 ## Release Notes
+
+### 2.0.0
+
+Major update with syncing support:
+- Added sync capability for API key names
+- Improved security with hybrid storage approach
+- Enhanced UI with sync status indicators
+- Updated documentation for sync features
 
 ### 1.0.0
 

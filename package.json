@@ -1,10 +1,10 @@
 {
   "name": "api-vault",
   "displayName": "API Vault",
-  "description": "A secure vault for storing and managing API keys",
-  "version": "0.0.1",
+  "description": "A secure vault for storing and managing API keys with sync support",
+  "version": "2.0.0",
   "icon": "API.png",
-  "publisher": "vscode",
+  "publisher": "JosephDavidWilsonJr",
   "repository": {
     "type": "git",
     "url": "https://github.com/joewilson/vscode-api-vault.git"

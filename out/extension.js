@@ -4,9 +4,10 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = require("vscode");
 class APIVaultViewProvider {
-    constructor(extensionUri, secretStorage) {
+    constructor(extensionUri, secretStorage, globalState) {
         this._extensionUri = extensionUri;
         this._secretStorage = secretStorage;
+        this._globalState = globalState;
     }
     resolveWebviewView(webviewView, context, _token) {
         this._view = webviewView;
@@ -64,8 +65,9 @@ class APIVaultViewProvider {
     }
     async _getAllKeys() {
         try {
-            const keysList = await this._secretStorage.get('api-vault-keys');
-            return keysList ? JSON.parse(keysList) : [];
+            // Get keys from global state (synced across instances)
+            const keys = this._globalState.get('api-vault-keys', []);
+            return keys;
         }
         catch (err) {
             const error = err;
@@ -78,7 +80,7 @@ class APIVaultViewProvider {
             const keys = await this._getAllKeys();
             if (!keys.includes(key)) {
                 keys.push(key);
-                await this._secretStorage.store('api-vault-keys', JSON.stringify(keys));
+                await this._globalState.update('api-vault-keys', keys);
             }
         }
         catch (err) {
@@ -90,7 +92,7 @@ class APIVaultViewProvider {
         try {
             const keys = await this._getAllKeys();
             const updatedKeys = keys.filter(k => k !== key);
-            await this._secretStorage.store('api-vault-keys', JSON.stringify(updatedKeys));
+            await this._globalState.update('api-vault-keys', updatedKeys);
         }
         catch (err) {
             const error = err;
@@ -174,6 +176,14 @@ class APIVaultViewProvider {
                     margin-top: 15px;
                     margin-bottom: 10px;
                 }
+                .sync-info {
+                    font-size: 0.9em;
+                    color: var(--vscode-descriptionForeground);
+                    margin-top: 10px;
+                    padding: 8px;
+                    background: var(--vscode-textBlockQuote-background);
+                    border-radius: 4px;
+                }
             </style>
         </head>
         <body>
@@ -191,6 +201,9 @@ class APIVaultViewProvider {
 
             <div class="stored-keys">
                 <h2>Stored API Keys</h2>
+                <div class="sync-info">
+                    ℹ️ Key names are synced across VS Code instances. Values remain secure in your system keychain.
+                </div>
                 <div id="keysList"></div>
             </div>
 
@@ -277,7 +290,7 @@ class APIVaultViewProvider {
 }
 function activate(context) {
     console.log('API Vault extension is now active!');
-    const provider = new APIVaultViewProvider(context.extensionUri, context.secrets);
+    const provider = new APIVaultViewProvider(context.extensionUri, context.secrets, context.globalState);
     APIVaultViewProvider.currentProvider = provider;
     context.subscriptions.push(vscode.window.registerWebviewViewProvider('apiVaultView', provider));
     // Register the store key command
@@ -298,12 +311,11 @@ function activate(context) {
                 if (!value)
                     return;
             }
-            // Get current keys list
-            const keysList = await context.secrets.get('api-vault-keys') || '[]';
-            const keys = JSON.parse(keysList);
+            // Get current keys list from global state
+            const keys = context.globalState.get('api-vault-keys', []);
             if (!keys.includes(key)) {
                 keys.push(key);
-                await context.secrets.store('api-vault-keys', JSON.stringify(keys));
+                await context.globalState.update('api-vault-keys', keys);
             }
             await context.secrets.store(key, value);
             vscode.window.showInformationMessage(`API key "${key}" stored successfully!`);
@@ -317,8 +329,7 @@ function activate(context) {
     let getKeyCommand = vscode.commands.registerCommand('api-vault.getKey', async (key) => {
         try {
             if (!key) {
-                const keysList = await context.secrets.get('api-vault-keys') || '[]';
-                const keys = JSON.parse(keysList);
+                const keys = context.globalState.get('api-vault-keys', []);
                 if (keys.length === 0) {
                     vscode.window.showInformationMessage('No API keys stored yet.');
                     return;
