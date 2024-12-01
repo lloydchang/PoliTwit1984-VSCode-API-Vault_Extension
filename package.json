@@ -1,0 +1,81 @@
+{
+  "name": "api-vault",
+  "displayName": "API Vault",
+  "description": "A secure vault for storing and managing API keys",
+  "version": "0.0.1",
+  "icon": "API.png",
+  "publisher": "vscode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joewilson/vscode-api-vault.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:apiVaultView"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "api-vault-sidebar",
+          "title": "API Vault",
+          "icon": "API.png"
+        }
+      ]
+    },
+    "views": {
+      "api-vault-sidebar": [
+        {
+          "type": "webview",
+          "id": "apiVaultView",
+          "name": "API Keys",
+          "icon": "API.png"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "api-vault.storeKey",
+        "title": "Store New API Key",
+        "category": "API Vault"
+      },
+      {
+        "command": "api-vault.listKeys",
+        "title": "List API Keys",
+        "category": "API Vault"
+      },
+      {
+        "command": "api-vault.getKey",
+        "title": "Get API Key",
+        "category": "API Vault"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^16.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.3"
+  }
+}
